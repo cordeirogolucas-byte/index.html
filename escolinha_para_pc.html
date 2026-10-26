@@ -1,0 +1,1226 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Escolinha de Futebol</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#f3f5f2; --card:#ffffff; --ink:#101828; --muted:#5f6b7a; --line:#e2e6e0; --soft:#eef2ee;
+  --brand:#0f5132; --brand-ink:#ffffff; --focus:#2563eb;
+  --ok:#15803d; --ok-bg:#e6f5ec;
+  --due:#dc2626; --due-bg:#fdeaea;
+  --late:#92400e; --late-bg:#fdf3c4; --late-dot:#eab308;
+  --c-ini:#2563eb; --c-mir:#7c3aed; --c-pre:#db2777;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c120f; --card:#131c17; --ink:#e7eee9; --muted:#9aa89f; --line:#27362e; --soft:#1a2620;
+    --brand:#2f9e6a; --brand-ink:#04140c; --focus:#60a5fa;
+    --ok:#4ade80; --ok-bg:#15352a; --due:#f87171; --due-bg:#3b1818;
+    --late:#fcd34d; --late-bg:#3a300e; --late-dot:#fbbf24;
+    --c-ini:#60a5fa; --c-mir:#a78bfa; --c-pre:#f472b6;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c120f; --card:#131c17; --ink:#e7eee9; --muted:#9aa89f; --line:#27362e; --soft:#1a2620;
+  --brand:#2f9e6a; --brand-ink:#04140c; --focus:#60a5fa;
+  --ok:#4ade80; --ok-bg:#15352a; --due:#f87171; --due-bg:#3b1818;
+  --late:#fcd34d; --late-bg:#3a300e; --late-dot:#fbbf24;
+  --c-ini:#60a5fa; --c-mir:#a78bfa; --c-pre:#f472b6;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 56px}
+h1,h2,h3{margin:0;font-weight:700;text-wrap:balance}
+h2{font-size:17px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.wrap{max-width:960px;margin:0 auto;display:grid;gap:16px}
+.panel{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;align-content:start;min-width:0}
+.head-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.sub{margin:0;color:var(--muted);font-size:13px}
+.sec{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-top:6px}
+.note{padding:12px 14px;border-radius:12px;background:var(--soft);font-size:14px}
+.note.erro{background:var(--due-bg);color:var(--due);font-weight:600}
+.erro-txt{color:var(--due);font-weight:600;font-size:13px}
+.arquivo{position:relative;overflow:hidden;cursor:pointer}
+.arquivo input{position:absolute;inset:0;width:100%;height:100%;opacity:0;padding:0;border:0;margin:0;cursor:pointer;font-size:0}
+.arquivo:focus-within{outline:2px solid var(--focus);outline-offset:2px}
+dialog.visor{border:1px solid var(--line);border-radius:16px;padding:0;width:min(960px,calc(100% - 24px));height:min(88vh,920px);background:var(--card);color:var(--ink);overflow:hidden}
+dialog.visor::backdrop{background:rgba(0,0,0,.55)}
+dialog.visor[open]{display:flex;flex-direction:column}
+.visor-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+.visor-corpo{flex:1;min-height:0;display:grid;place-items:center;background:var(--soft);overflow:auto;padding:8px}
+.visor-corpo img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.visor-corpo iframe{width:100%;height:100%;border:0;background:#fff}
+
+/* Cabeçalho */
+.top{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;background:var(--brand);color:var(--brand-ink);border-radius:16px;padding:20px 22px}
+.top h1{font-size:24px;font-weight:800;letter-spacing:-.01em}
+.top p{margin:4px 0 0;font-size:14px;opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;flex:1 1 360px;max-width:520px}
+.stat{background:rgba(255,255,255,.14);border-radius:12px;padding:10px 12px;min-width:0}
+.stat b{display:block;font-size:22px;line-height:1.15;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;opacity:.9}
+
+/* Abas */
+.tabs{display:flex;gap:4px;padding:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+.tab{flex:1 0 auto;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;font-weight:600;padding:9px 14px;border-radius:9px;cursor:pointer;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--brand);color:var(--brand-ink)}
+.barra-abas{display:flex;gap:8px;align-items:center;min-width:0}
+.barra-abas .tabs{flex:1 1 auto;min-width:0}
+.tema{flex:0 0 auto;white-space:nowrap}
+
+/* Campos */
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.form .full{grid-column:1/-1}
+.f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.f>span{font-size:13px;font-weight:600;color:var(--muted)}
+input,select,textarea{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
+textarea{min-height:120px;resize:vertical;line-height:1.5}
+input[type=checkbox],input[type=radio]{width:auto;accent-color:var(--brand);margin:0}
+input[type=file]{padding:7px;font-size:13px}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:10px}
+.search{max-width:300px;flex:1 1 220px}
+.photo{display:flex;flex-wrap:wrap;gap:18px;align-items:center}
+.photo-box{width:116px;max-width:100%;aspect-ratio:3/4;border-radius:12px;border:1.5px dashed var(--line);background:var(--soft);display:grid;place-items:center;overflow:hidden;color:var(--muted);font-size:13px;font-weight:600}
+.photo-box img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-info{flex:1 1 220px;min-width:0;display:grid;gap:8px}
+
+/* Opções em pílula */
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{position:relative;cursor:pointer}
+.opt input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.opt span{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1.5px solid var(--line);border-radius:999px;font-size:14px;font-weight:600;background:var(--bg)}
+.opt span::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--dot,var(--brand))}
+.opt.plain span::before{display:none}
+.opt input:checked+span{border-color:var(--dot,var(--brand));background:color-mix(in srgb,var(--dot,var(--brand)) 12%,transparent)}
+.opt input:focus-visible+span{outline:2px solid var(--focus);outline-offset:2px}
+.chk{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;cursor:pointer}
+
+/* Botões */
+.btn{font:inherit;font-size:14px;font-weight:600;padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{background:var(--soft)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn.danger{color:var(--due)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+
+/* Listas */
+.list{display:grid;gap:8px}
+.row{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 14px;border:1px solid var(--line);border-left:4px solid var(--edge,var(--line));border-radius:12px;min-width:0}
+.row.ok{--edge:var(--ok)}
+.row.due{--edge:var(--due)}
+.row.late{--edge:var(--late-dot)}
+.info{flex:1 1 auto;min-width:0;display:grid;gap:2px}
+.info strong{font-weight:600;overflow-wrap:anywhere}
+.info small{color:var(--muted);font-size:13px}
+.end{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+.thumb{width:38px;height:50px;border-radius:7px;background:var(--soft);overflow:hidden;display:grid;place-items:center;flex:0 0 auto;font-size:12px;font-weight:700;color:var(--brand)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px;font-size:14px}
+
+/* Etiquetas de situação e categoria */
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;color:var(--c);background:var(--cb)}
+.tag::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.tag.ok{--c:var(--ok);--cb:var(--ok-bg)}
+.tag.due{--c:var(--due);--cb:var(--due-bg)}
+.tag.late{--c:var(--late);--cb:var(--late-bg)}
+.tag.late::before{background:var(--late-dot)}
+.cat{display:inline-flex;font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;color:var(--k);background:color-mix(in srgb,var(--k) 14%,transparent);white-space:nowrap}
+.cat.ini{--k:var(--c-ini)}
+.cat.mir{--k:var(--c-mir)}
+.cat.pre{--k:var(--c-pre)}
+.legend{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Mensalidades: detalhe */
+.det-title{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.det-title h2{font-size:20px}
+.months{display:flex;flex-wrap:wrap;gap:8px}
+.month{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:14px;background:var(--bg)}
+.month.late{border-color:var(--late-dot)}
+.month small{color:var(--muted);font-size:12px}
+.total{font-weight:600;min-height:20px}
+.table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.table th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:8px 6px;border-bottom:1px solid var(--line)}
+.table td{padding:10px 6px;border-bottom:1px solid var(--line)}
+.scroll{overflow-x:auto}
+
+/* Aviso rápido */
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:9}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:640px){
+  .form{grid-template-columns:minmax(0,1fr)}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr));max-width:none;width:100%}
+  .top h1{font-size:21px}
+  .card{padding:16px}
+  .tab{font-size:13px;padding:8px 11px}
+  input,select,textarea{font-size:16px}
+  .barra-abas{gap:6px}
+  .tema{padding:8px 10px;font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <div>
+    <h1>Escolinha de Futebol</h1>
+    <p>Cadastro, mensalidades e documentos dos alunos</p>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="s-ativos">0</b><span>Ativos</span></div>
+    <div class="stat"><b id="s-ok">0</b><span>Em dia</span></div>
+    <div class="stat"><b id="s-due">0</b><span>Pendentes</span></div>
+    <div class="stat"><b id="s-late">0</b><span>Vencidos</span></div>
+  </div>
+</header>
+
+<div id="aviso" class="note" hidden></div>
+
+<div class="barra-abas">
+<nav class="tabs" role="tablist" aria-label="Seções">
+  <button class="tab" role="tab" data-tab="cad" aria-selected="true">Cadastro</button>
+  <button class="tab" role="tab" data-tab="doc" aria-selected="false">Documentos e endereço</button>
+  <button class="tab" role="tab" data-tab="pag" aria-selected="false">Mensalidades</button>
+  <button class="tab" role="tab" data-tab="cob" aria-selected="false">Cobranças</button>
+  <button class="tab" role="tab" data-tab="anx" aria-selected="false">Anexos</button>
+  <button class="tab" role="tab" data-tab="sai" aria-selected="false">Alunos que saíram</button>
+</nav>
+<button id="tema" class="btn sm tema" type="button" aria-pressed="false">Modo escuro</button>
+</div>
+
+<!-- Aba: cadastro (campos obrigatórios) -->
+<section class="panel" data-p="cad" id="p-cad">
+  <section class="card">
+    <h2 id="ficha-titulo">Novo aluno</h2>
+    <p class="sub" id="ficha-sub">Preencha os campos obrigatórios. Documentos e endereço ficam na aba Documentos.</p>
+    <div class="note erro" id="ficha-erro" hidden></div>
+    <div class="photo">
+      <div class="photo-box" id="foto-box">Foto 3x4</div>
+      <div class="photo-info">
+        <label class="f"><span>Foto 3x4</span><input type="file" id="foto-input" accept="image/*"></label>
+        <p class="sub">A imagem é ajustada automaticamente ao formato 3x4.</p>
+      </div>
+    </div>
+    <div class="form">
+      <label class="f full"><span>Nome do aluno</span><input data-f="nome" autocomplete="off"></label>
+      <label class="f"><span>Data de nascimento</span><input type="date" data-f="nascimento"></label>
+      <label class="f"><span>Data de início (dia em que entrou na escola)</span><input type="date" data-f="inicio"></label>
+      <div class="f full"><span>Categoria</span>
+        <div class="opts">
+          <label class="opt" style="--dot:var(--c-ini)"><input type="radio" name="cat" value="Iniciação" data-f="categoria"><span>Iniciação</span></label>
+          <label class="opt" style="--dot:var(--c-mir)"><input type="radio" name="cat" value="Mirim" data-f="categoria"><span>Mirim</span></label>
+          <label class="opt" style="--dot:var(--c-pre)"><input type="radio" name="cat" value="Infantil" data-f="categoria"><span>Infantil</span></label>
+        </div>
+      </div>
+      <label class="f"><span>Nome do pai</span><input data-f="pai"></label>
+      <label class="f"><span>Nome da mãe</span><input data-f="mae"></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Telefones para contato</h2>
+    <p class="sub">Telefones 1 e 2 são obrigatórios. O telefone 3 é opcional. A identificação mostra de quem é o telefone, como Mãe ou Pai.</p>
+    <div class="form">
+      <div class="f full"><span>Telefone 1</span>
+        <div class="pair"><input data-f="tel1_rot" placeholder="Identificação"><input data-f="tel1_num" inputmode="tel" placeholder="(00) 00000-0000"></div>
+      </div>
+      <div class="f full"><span>Telefone 2</span>
+        <div class="pair"><input data-f="tel2_rot" placeholder="Identificação"><input data-f="tel2_num" inputmode="tel" placeholder="(00) 00000-0000"></div>
+      </div>
+      <div class="f full"><span>Telefone 3 (opcional)</span>
+        <div class="pair"><input data-f="tel3_rot" placeholder="Identificação"><input data-f="tel3_num" inputmode="tel" placeholder="(00) 00000-0000"></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" type="button" data-clear>Limpar</button>
+      <button class="btn pri" type="button" data-save>Salvar aluno</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="head-row">
+      <h2>Alunos ativos</h2>
+      <input type="search" id="q-cad" class="search" placeholder="Buscar pelo nome" aria-label="Buscar aluno">
+    </div>
+    <div class="list" id="lista-cad"></div>
+  </section>
+
+  <section class="card">
+    <h2>Cópia dos dados</h2>
+    <p class="sub">Os dados ficam só neste navegador. Salve uma cópia para não perder nada, ou restaure uma cópia salva pelo link do Claude.</p>
+    <div class="actions">
+      <button class="btn" id="copia-salvar" type="button">Salvar cópia</button>
+      <label class="btn arquivo" id="copia-restaurar-box" hidden>Restaurar cópia<input type="file" id="copia-restaurar" accept=".json,application/json"></label>
+    </div>
+  </section>
+</section>
+
+<!-- Aba: documentos e endereço -->
+<section class="panel" data-p="doc" id="p-doc" hidden>
+  <section class="card">
+    <h2>Documentos</h2>
+    <p class="sub">CPF e RG são obrigatórios para cadastrar o aluno.</p>
+    <div class="form">
+      <label class="f"><span>CPF do aluno</span><input data-f="cpf" inputmode="numeric" placeholder="000.000.000-00"></label>
+      <label class="f"><span>RG do aluno</span><input data-f="rg"></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Endereço e escola</h2>
+    <p class="sub">Opcional. Preencha quando o responsável informar. A falta destes dados não impede o cadastro.</p>
+    <div class="form">
+      <label class="f full"><span>Endereço</span><input data-f="endereco"></label>
+      <label class="f"><span>Bairro</span><input data-f="bairro"></label>
+      <label class="f"><span>Período escolar</span>
+        <select data-f="periodo">
+          <option value="">Selecione</option>
+          <option>Matutino</option>
+          <option>Vespertino</option>
+          <option>Noturno</option>
+        </select>
+      </label>
+      <label class="f full"><span>Nome da escola</span><input data-f="escola"></label>
+    </div>
+    <div class="actions">
+      <button class="btn pri" type="button" data-save>Salvar aluno</button>
+    </div>
+  </section>
+</section>
+
+<!-- Aba: mensalidades -->
+<section class="panel" data-p="pag" id="p-pag" hidden>
+  <section class="card">
+    <h2>Valor da mensalidade</h2>
+    <p class="sub">Cada aluno paga do mês de entrada até dezembro. Quando todo o ano está pago, o ciclo recomeça no ano seguinte, de janeiro a dezembro.</p>
+    <div class="form">
+      <label class="f"><span>Valor da mensalidade (R$)</span><input id="cfg-valor" inputmode="decimal" placeholder="0,00"></label>
+    </div>
+    <div class="actions"><button class="btn pri" id="cfg-salvar" type="button">Salvar valores</button></div>
+  </section>
+
+  <section class="card">
+    <div class="head-row">
+      <h2>Mensalidades</h2>
+      <input type="search" id="q-pag" class="search" placeholder="Pesquisar aluno" aria-label="Pesquisar aluno">
+    </div>
+    <div class="legend">
+      <span class="tag ok">Em dia</span>
+      <span class="tag due">Pendente</span>
+      <span class="tag late">Vencido</span>
+    </div>
+    <div class="list" id="lista-pag"></div>
+  </section>
+
+  <section class="card" id="pag-det" hidden>
+    <div class="head-row">
+      <div class="det-title"><h2 id="pd-nome"></h2><span id="pd-tag"></span></div>
+      <button class="btn sm" id="pd-fechar" type="button">Fechar</button>
+    </div>
+
+    <p class="sub" id="pd-regra"></p>
+    <h3 class="sec">Meses em aberto</h3>
+    <div class="months" id="pd-meses"></div>
+
+    <h3 class="sec">Registrar pagamento</h3>
+    <div class="form">
+      <div class="f full"><span>Forma de pagamento</span>
+        <div class="opts">
+          <label class="opt plain"><input type="radio" name="pmetodo" value="PIX" checked><span>PIX</span></label>
+          <label class="opt plain"><input type="radio" name="pmetodo" value="Dinheiro"><span>Dinheiro</span></label>
+          <label class="opt plain"><input type="radio" name="pmetodo" value="Cartão de débito"><span>Cartão de débito</span></label>
+          <label class="opt plain"><input type="radio" name="pmetodo" value="Cartão de crédito"><span>Cartão de crédito</span></label>
+        </div>
+      </div>
+      <label class="f" id="pd-parc-wrap" hidden><span>Parcelas no crédito</span>
+        <select id="pd-parc"><option value="1">1x</option><option value="2">2x</option><option value="3">3x</option></select>
+      </label>
+      <label class="f"><span>Data do pagamento</span><input type="date" id="pd-data"></label>
+      <label class="f"><span>Valor por mês (R$)</span><input id="pd-valor" inputmode="decimal"></label>
+    </div>
+    <p class="total" id="pd-total"></p>
+    <div class="actions"><button class="btn pri" id="pd-registrar" type="button">Registrar pagamento</button></div>
+
+    <h3 class="sec">Histórico</h3>
+    <div class="scroll">
+      <table class="table">
+        <thead><tr><th>Mês</th><th>Valor</th><th>Forma</th><th>Pago em</th><th></th></tr></thead>
+        <tbody id="pd-hist"></tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<!-- Aba: cobranças aos responsáveis -->
+<section class="panel" data-p="cob" id="p-cob" hidden>
+  <section class="card">
+    <h2>Mensagem para os responsáveis</h2>
+    <p class="sub">Use estes campos no texto: {responsavel}, {aluno}, {meses} e {total}. A página prepara a mensagem e abre o WhatsApp com ela; você confirma o envio lá.</p>
+    <label class="f"><span>Texto da mensagem</span><textarea id="cob-texto" rows="5"></textarea></label>
+    <div class="actions"><button class="btn" id="cob-padrao" type="button">Voltar ao texto padrão</button></div>
+  </section>
+
+  <section class="card">
+    <div class="head-row">
+      <h2>Mensalidades vencidas</h2>
+      <span class="sub" id="cob-total"></span>
+    </div>
+    <div class="list" id="lista-cob"></div>
+  </section>
+</section>
+
+<!-- Aba: anexos -->
+<section class="panel" data-p="anx" id="p-anx" hidden>
+  <section class="card">
+    <div class="head-row">
+      <h2>Documentos do aluno</h2>
+      <label class="f" style="min-width:220px;flex:0 1 320px"><span>Aluno</span><select id="anx-sel"></select></label>
+    </div>
+    <div class="note" id="anx-aviso" hidden>Anexar arquivos não está disponível nesta versão. Aqui você pode marcar cada documento como recebido.</div>
+    <div class="list" id="anx-docs"></div>
+  </section>
+</section>
+
+<!-- Aba: alunos que saíram -->
+<section class="panel" data-p="sai" id="p-sai" hidden>
+  <section class="card">
+    <h2>Registrar saída</h2>
+    <div class="form">
+      <label class="f"><span>Aluno</span><select id="sai-sel"></select></label>
+      <label class="f"><span>Data da saída</span><input type="date" id="sai-data"></label>
+      <label class="f full"><span>Motivo (opcional)</span><input id="sai-motivo" placeholder="Ex.: mudança de cidade"></label>
+    </div>
+    <div class="actions"><button class="btn pri" id="sai-reg" type="button">Mover para alunos que saíram</button></div>
+  </section>
+
+  <section class="card">
+    <div class="head-row">
+      <h2>Alunos que saíram</h2>
+      <input type="search" id="q-sai" class="search" placeholder="Buscar aluno" aria-label="Buscar aluno que saiu">
+    </div>
+    <div class="list" id="lista-sai"></div>
+  </section>
+</section>
+
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const $$ = q => Array.from(document.querySelectorAll(q));
+const CATS = {"Iniciação":"ini","Mirim":"mir","Infantil":"pre"};
+const ROTULO = {ok:"Em dia", due:"Pendente", late:"Vencido"};
+const ORDEM = {late:0, due:1, ok:2};
+const MESES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const DOCS = [
+  ["rg_cpf","RG e CPF do aluno"],
+  ["comp_end","Comprovante de endereço"],
+  ["rg_cpf_2","RG e CPF dos pais"],
+  ["declaracao","Declaração escolar"],
+  ["boletim","Boletim escolar"],
+  ["atestado","Atestado médico"]
+];
+const S = {db:null, assets:null, alunos:[], pagamentos:[], cfg:{valor:0, dia:10}, foto:"", editId:null, pagId:null, pagDet:null, anxId:null};
+let cfgCarregada = false;
+
+/* Obrigatórios para cadastrar: foto, dados do aluno, pais, CPF, RG e telefones 1 e 2.
+   Endereço, bairro, período, escola e telefone 3 são opcionais. */
+const SUB_NOVO = "Preencha os campos obrigatórios. Documentos e endereço ficam na aba Documentos.";
+const OBRIGATORIOS = [
+  ["foto","Foto 3x4"], ["nome","Nome do aluno"], ["nascimento","Data de nascimento"],
+  ["inicio","Data de início"], ["categoria","Categoria"], ["pai","Nome do pai"], ["mae","Nome da mãe"],
+  ["cpf","CPF"], ["rg","RG"]
+];
+function faltando(d){
+  const f = OBRIGATORIOS.filter(([k])=> k==="foto" ? !S.foto : !d[k]).map(([,l])=>l);
+  if(!d.tel1_num) f.push("Telefone 1");
+  if(!d.tel2_num) f.push("Telefone 2");
+  return f;
+}
+
+/* ---------- utilidades ---------- */
+function el(tag, props, ...kids){
+  const e = document.createElement(tag);
+  for(const k in (props||{})){
+    const v = props[k];
+    if(v===false || v==null) continue;
+    if(k==="text") e.textContent = v;
+    else if(k==="class") e.className = v;
+    else if(k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v===true ? "" : v);
+  }
+  for(const c of kids.flat()) if(c!=null && c!==false) e.append(c.nodeType ? c : String(c));
+  return e;
+}
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const fmtData = s => s ? s.split("-").reverse().join("/") : "—";
+const refOf = i => `${Math.floor(i/12)}-${String(i%12+1).padStart(2,"0")}`;
+const mesLabel = ref => { const [y,m]=ref.split("-"); return `${MESES[Number(m)-1]}/${y}`; };
+const moeda = n => Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+function parseMoeda(s){
+  let t = String(s||"").replace(/R\$/i,"").replace(/\s/g,"");
+  if(t.includes(",")) t = t.replace(/\./g,"").replace(",",".");
+  const n = Number(t); return isFinite(n) ? n : 0;
+}
+const norm = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const porNome = (a,b) => a.nome.localeCompare(b.nome,"pt-BR");
+const ativos = () => S.alunos.filter(a=>a.status!=="saiu");
+const saidos = () => S.alunos.filter(a=>a.status==="saiu");
+const vazio = t => el("div",{class:"empty", text:t});
+const catTag = c => c ? el("span",{class:"cat "+(CATS[c]||""), text:c}) : null;
+const tagSit = k => el("span",{class:"tag "+k, text:ROTULO[k]});
+function miniatura(a){
+  const ini = (a.nome||"?").split(" ").filter(Boolean).slice(0,2).map(p=>p[0]).join("").toUpperCase();
+  return el("div",{class:"thumb"}, a.foto ? el("img",{src:a.foto, alt:""}) : el("span",{text:ini}));
+}
+function toast(msg){
+  const t=$("toast"); t.textContent=msg; t.classList.add("on");
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("on"), 2600);
+}
+function aviso(t){ const a=$("aviso"); a.textContent=t; a.hidden=false; }
+async function gravar(fn, okMsg){
+  if(!S.db){ toast("Abra a página pelo link do Claude para salvar."); return false; }
+  try{ await fn(); if(okMsg) toast(okMsg); return true; }
+  catch(e){
+    console.error(e);
+    toast(e && e.code==="quota_exceeded" ? "Limite de armazenamento atingido." : "Não foi possível salvar. Tente novamente.");
+    return false;
+  }
+}
+
+/* ---------- situação de pagamento ---------- */
+function situacao(a){
+  const hoje = new Date();
+  const hoje0 = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+  const [y,m,d] = String(a.inicio||"").split("-").map(Number);
+  if(!y) return {key:"ok", abertos:[], ano:null, inicio:null};
+  const pagos = new Set(S.pagamentos.filter(p=>p.alunoId===a.id).map(p=>p.ref));
+  // Ciclo: começa no mês de entrada e vai até dezembro. Quando todos os meses do ciclo estão pagos,
+  // o ciclo passa para o ano seguinte, com janeiro a dezembro.
+  let ano = y, inicio = y*12 + (m-1);
+  for(let guarda=0; guarda<50; guarda++){
+    const fimCiclo = ano*12 + 11;
+    let quitado = true;
+    for(let i=inicio; i<=fimCiclo; i++){ if(!pagos.has(refOf(i))){ quitado = false; break; } }
+    if(!quitado) break;
+    ano += 1; inicio = ano*12;
+  }
+  const fim = ano*12 + 11;
+  const abertos = [];
+  for(let i=inicio; i<=fim; i++){
+    const ref = refOf(i);
+    if(pagos.has(ref)) continue;
+    const ultimo = new Date(Math.floor(i/12), i%12+1, 0).getDate();
+    const venc = new Date(Math.floor(i/12), i%12, Math.min(d, ultimo));
+    const futuro = new Date(Math.floor(i/12), i%12, 1) > hoje0;
+    abertos.push({ref, venc, vencido: venc<hoje0, futuro});
+  }
+  // Meses que ainda não começaram não são pendentes: o aluno continua em dia.
+  const pendentes = abertos.filter(x=>!x.futuro);
+  const key = !pendentes.length ? "ok" : pendentes.some(x=>x.vencido) ? "late" : "due";
+  return {key, abertos, ano, inicio};
+}
+
+/* ---------- armazenamento neste navegador (usado quando a página não está ligada ao Claude) ---------- */
+function localDb(){
+  const KEY = "escolinha-dados-v1";
+  const ouvintes = new Set();
+  const avisar = () => ouvintes.forEach(f=>f());
+  const ler = () => { try{ return JSON.parse(localStorage.getItem(KEY) || "{}"); }catch(e){ return {}; } };
+  const salvarTudo = t => {
+    try{ localStorage.setItem(KEY, JSON.stringify(t)); }
+    catch(e){ throw {code:"quota_exceeded", message:"Armazenamento cheio"}; }
+    avisar();
+  };
+  const mesclar = (a, b) => {
+    const r = {...(a||{})};
+    for(const k in b){
+      const v = b[k];
+      r[k] = (v && typeof v==="object" && !Array.isArray(v) && r[k] && typeof r[k]==="object") ? mesclar(r[k], v) : v;
+    }
+    return r;
+  };
+  const foto = (id, data) => ({id, exists: data!==undefined, data: ()=> data===undefined ? undefined : {...data}});
+  const doc = path => ({
+    id: path.split("/").pop(),
+    set: async d => { const t=ler(); t[path]={...d}; salvarTudo(t); },
+    update: async d => {
+      const t=ler();
+      if(t[path]===undefined) throw {code:"invalid_argument", message:"Documento não existe"};
+      t[path]=mesclar(t[path], d); salvarTudo(t);
+    },
+    delete: async () => { const t=ler(); delete t[path]; salvarTudo(t); },
+    onSnapshot(next){
+      const f = () => next(foto(path.split("/").pop(), ler()[path]));
+      ouvintes.add(f); f();
+      return () => ouvintes.delete(f);
+    }
+  });
+  const colecao = col => ({
+    doc: id => doc(col + "/" + (id || Math.random().toString(36).slice(2,12))),
+    onSnapshot(next){
+      const f = () => {
+        const t = ler();
+        next({docs: Object.keys(t).filter(k=>k.startsWith(col+"/") && k.split("/").length===2)
+          .map(k=>foto(k.split("/")[1], t[k]))});
+      };
+      ouvintes.add(f); f();
+      return () => ouvintes.delete(f);
+    }
+  });
+  window.addEventListener("storage", avisar);
+  return {collection: colecao, doc};
+}
+
+/* ---------- cópia dos dados (arquivo para guardar ou levar para a página do GitHub) ---------- */
+async function salvarArquivo(nome, blob){
+  if(S.downloads){ await S.downloads.save({filename: nome, data: blob}); return; }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = nome; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 2000);
+}
+async function salvarCopia(){
+  const copia = {
+    versao: 1,
+    gerado: new Date().toISOString(),
+    configuracao: {valor: S.cfg.valor || 0},
+    alunos: S.alunos.map(a=>({...a})),
+    pagamentos: S.pagamentos.map(p=>({...p}))
+  };
+  try{
+    await salvarArquivo("Escolinha - copia " + iso(new Date()) + ".json",
+      new Blob([JSON.stringify(copia)], {type:"application/json"}));
+  }catch(e){
+    if(e && e.code === "declined") return;
+    console.error(e); toast("Não foi possível salvar a cópia."); return;
+  }
+  toast("Cópia salva.");
+}
+/* Restaura uma cópia neste navegador (página do GitHub). Os arquivos anexados não vêm na cópia: fica só a marcação de recebido. */
+async function restaurarCopia(file){
+  if(!S.local){ toast("Restaurar só funciona na página do GitHub."); return; }
+  let copia = null;
+  try{ copia = JSON.parse(await file.text()); }catch(e){ copia = null; }
+  if(!copia || copia.versao !== 1 || !Array.isArray(copia.alunos)){ toast("Este arquivo não é uma cópia da escolinha."); return; }
+  let arvore = {};
+  try{ arvore = JSON.parse(localStorage.getItem("escolinha-dados-v1") || "{}"); }catch(e){ arvore = {}; }
+  for(const a of copia.alunos){
+    const {id, ...d} = a;
+    for(const k in (d.anexos || {})){ d.anexos[k] = {recebido: !!(d.anexos[k] && d.anexos[k].recebido)}; }
+    arvore["alunos/"+id] = d;
+  }
+  for(const p of copia.pagamentos || []){ const {id, ...d} = p; arvore["pagamentos/"+id] = d; }
+  if(copia.configuracao) arvore["config/taxas"] = {valor: Number(copia.configuracao.valor) || 0};
+  try{ localStorage.setItem("escolinha-dados-v1", JSON.stringify(arvore)); }
+  catch(e){ toast("Não há espaço neste navegador para esta cópia."); return; }
+  toast("Cópia restaurada.");
+  setTimeout(()=> location.reload(), 800);
+}
+
+/* ---------- conexão com o banco ---------- */
+async function boot(){
+  try{
+    if(window.claude && window.claude.use){
+      const [db, assets, downloads] = await Promise.all([window.claude.use("db"), window.claude.use("assets"), window.claude.use("downloads").catch(()=>null)]);
+      S.db = db; S.assets = assets; S.downloads = downloads;
+    }
+  }catch(e){ console.error(e); }
+  if(!S.db){
+    S.db = localDb();
+    S.local = true;
+    $("copia-restaurar-box").hidden = false;
+    aviso("Os dados ficam salvos neste navegador. Eles não são compartilhados com outros computadores.");
+  }
+  const falha = () => aviso("Erro ao carregar os dados. Recarregue a página.");
+  S.db.collection("alunos").onSnapshot(s=>{
+    S.alunos = s.docs.filter(d=>d.exists).map(d=>({...d.data(), id:d.id})); render();
+  }, falha);
+  S.db.collection("pagamentos").onSnapshot(s=>{
+    S.pagamentos = s.docs.filter(d=>d.exists).map(d=>({...d.data(), id:d.id})); render();
+  }, falha);
+  S.db.doc("config/taxas").onSnapshot(s=>{
+    const c = s.exists ? s.data() : {};
+    S.cfg = {valor:Number(c.valor)||0};
+    if(!cfgCarregada){
+      cfgCarregada = true;
+      $("cfg-valor").value = S.cfg.valor ? String(S.cfg.valor).replace(".",",") : "";
+    }
+    render();
+  }, falha);
+}
+
+/* ---------- abas ---------- */
+function aba(key){
+  $$(".tab").forEach(t=>t.setAttribute("aria-selected", String(t.dataset.tab===key)));
+  $$(".panel").forEach(p=>{ p.hidden = p.dataset.p!==key; });
+}
+
+/* ---------- ficha do aluno (abas Cadastro e Contato) ---------- */
+const campos = () => $$("[data-f]");
+function lerFicha(){
+  const d = {};
+  for(const e of campos()){
+    const k = e.dataset.f;
+    if(e.type==="radio"){ if(!(k in d)) d[k]=""; if(e.checked) d[k]=e.value; }
+    else d[k] = e.value.trim();
+  }
+  return d;
+}
+function preencherFicha(a){
+  for(const e of campos()){
+    const v = a[e.dataset.f] ?? "";
+    if(e.type==="radio") e.checked = e.value===v; else e.value = v;
+  }
+  S.foto = a.foto || ""; mostrarFoto();
+}
+function limparFicha(){
+  for(const e of campos()){ if(e.type==="radio") e.checked=false; else e.value=""; }
+  S.foto=""; S.editId=null; mostrarFoto();
+  $("foto-input").value="";
+  $("ficha-titulo").textContent="Novo aluno";
+  $("ficha-sub").textContent=SUB_NOVO;
+  $("ficha-erro").hidden=true;
+}
+function mostrarFoto(){
+  const b=$("foto-box"); b.replaceChildren();
+  if(S.foto) b.append(el("img",{src:S.foto, alt:"Foto 3x4 do aluno"})); else b.textContent="Foto 3x4";
+}
+function reduzirFoto(file){
+  return new Promise((ok, err)=>{
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = ()=>{
+      const W=240, H=320, c=document.createElement("canvas");
+      c.width=W; c.height=H;
+      const x = c.getContext("2d"), s = Math.max(W/img.width, H/img.height);
+      x.fillStyle="#fff"; x.fillRect(0,0,W,H);
+      x.drawImage(img, (W-img.width*s)/2, (H-img.height*s)/2, img.width*s, img.height*s);
+      URL.revokeObjectURL(url);
+      ok(c.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(url); err(new Error("imagem")); };
+    img.src = url;
+  });
+}
+async function salvarFicha(){
+  const d = lerFicha();
+  const falta = faltando(d);
+  const erro = $("ficha-erro");
+  if(falta.length){
+    erro.textContent = "Não é possível cadastrar. Preencha: " + falta.join(", ") + ".";
+    erro.hidden = false;
+    toast("Preencha todos os campos obrigatórios.");
+    return;
+  }
+  if(d.nascimento && d.inicio && d.inicio <= d.nascimento){
+    erro.textContent = "A data de início precisa ser depois da data de nascimento. Confira as duas datas.";
+    erro.hidden = false;
+    return;
+  }
+  erro.hidden = true;
+  const dados = {...d, foto:S.foto||""};
+  const editando = S.editId;
+  const ok = await gravar(async()=>{
+    if(editando) await S.db.collection("alunos").doc(editando).update(dados);
+    else await S.db.collection("alunos").doc().set({...dados, status:"ativo", anexos:{}});
+  }, editando ? "Cadastro atualizado." : "Aluno cadastrado.");
+  if(ok) limparFicha();
+}
+function editar(id){
+  const a = S.alunos.find(x=>x.id===id); if(!a) return;
+  S.editId = id; preencherFicha(a);
+  $("ficha-titulo").textContent = "Editando: " + a.nome;
+  $("ficha-sub").textContent = "Altere os campos e clique em Salvar aluno. Use Limpar para cadastrar outro aluno.";
+  aba("cad");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function renderCadastro(){
+  const q = norm($("q-cad").value);
+  const lista = ativos().filter(a=>!q || norm(a.nome).includes(q)).sort(porNome);
+  const box = $("lista-cad"); box.replaceChildren();
+  if(!lista.length){ box.append(vazio(q ? "Nenhum aluno encontrado." : "Nenhum aluno cadastrado ainda.")); return; }
+  for(const a of lista){
+    box.append(el("div",{class:"row"},
+      miniatura(a),
+      el("div",{class:"info"},
+        el("strong",{text:a.nome}),
+        el("small",{text:`Início: ${fmtData(a.inicio)}${a.periodo ? " · "+a.periodo : ""}`})),
+      el("div",{class:"end"}, catTag(a.categoria),
+        el("button",{class:"btn sm", type:"button", text:"Editar", onclick:()=>editar(a.id)}))));
+  }
+}
+
+/* ---------- mensalidades ---------- */
+function renderMensal(){
+  const q = norm($("q-pag").value);
+  const linhas = ativos()
+    .filter(a=>!q || norm(a.nome).includes(q))
+    .map(a=>({a, s:situacao(a)}))
+    .sort((x,y)=> ORDEM[x.s.key]-ORDEM[y.s.key] || porNome(x.a,y.a));
+  const box = $("lista-pag"); box.replaceChildren();
+  if(!linhas.length) box.append(vazio(q ? "Nenhum aluno encontrado." : "Cadastre alunos para acompanhar as mensalidades."));
+  for(const {a,s} of linhas){
+    box.append(el("div",{class:"row "+s.key},
+      miniatura(a),
+      el("div",{class:"info"},
+        el("strong",{text:a.nome}),
+        el("small",{text: s.abertos.filter(o=>!o.futuro).length ? `${s.abertos.filter(o=>!o.futuro).length} mês(es) em aberto` : "Sem pendências"})),
+      el("div",{class:"end"}, tagSit(s.key),
+        el("button",{class:"btn sm", type:"button", text: S.pagId===a.id ? "Aberto" : "Abrir", onclick:()=>abrirPag(a.id)}))));
+  }
+  renderDetalhe();
+}
+function abrirPag(id){
+  S.pagId = id;
+  $("pd-valor").value = S.cfg.valor ? String(S.cfg.valor).replace(".",",") : "";
+  $("pd-data").value = iso(new Date());
+  renderMensal();
+  $("pag-det").scrollIntoView({behavior:"smooth", block:"start"});
+}
+function renderDetalhe(){
+  const box = $("pag-det");
+  const a = S.pagId ? S.alunos.find(x=>x.id===S.pagId && x.status!=="saiu") : null;
+  box.hidden = !a;
+  if(!a) return;
+  const trocou = S.pagDet!==a.id; S.pagDet = a.id;
+  const manter = new Set(trocou ? [] : $$("#pd-meses input:checked").map(i=>i.value));
+  const s = situacao(a);
+  $("pd-nome").textContent = a.nome;
+  $("pd-tag").replaceChildren(tagSit(s.key));
+  const dias = (Date.now() - new Date(a.inicio + "T00:00:00").getTime()) / 86400000;
+  const antigo = dias > 365 ? ` Atenção: a data de início é ${fmtData(a.inicio)}, de mais de um ano atrás. Confira se é o dia em que o aluno entrou na escola. Meses já pagos antes devem ser registrados.` : "";
+  $("pd-regra").textContent = (s.ano ? `Ciclo atual: ${MESES[s.inicio%12]}/${Math.floor(s.inicio/12)} a dezembro/${s.ano}, vencendo todo dia ${Number(a.inicio.split("-")[2])}.` : "") + antigo;
+  const meses = $("pd-meses"); meses.replaceChildren();
+  if(!s.abertos.length) meses.append(vazio("Todas as mensalidades estão pagas."));
+  for(const o of s.abertos){
+    const cb = el("input",{type:"checkbox", value:o.ref, onchange:atualizarTotal});
+    cb.checked = manter.has(o.ref);
+    meses.append(el("label",{class:"month"+(o.vencido ? " late" : "")}, cb,
+      el("span",{text:mesLabel(o.ref)}),
+      el("small",{text: o.futuro ? "ainda não começou" : "vence "+fmtData(iso(o.venc))}),
+      o.vencido ? el("span",{class:"tag late", text:"Vencido"}) : null));
+  }
+  const tb = $("pd-hist"); tb.replaceChildren();
+  const pags = S.pagamentos.filter(p=>p.alunoId===a.id).sort((x,y)=>y.ref.localeCompare(x.ref));
+  if(!pags.length) tb.append(el("tr",null, el("td",{colspan:5, class:"sub", text:"Nenhum pagamento registrado."})));
+  for(const p of pags){
+    const forma = p.metodo + (p.metodo==="Cartão de crédito" && p.parcelas>1 ? ` · ${p.parcelas}x` : "");
+    tb.append(el("tr",null,
+      el("td",{text:mesLabel(p.ref)}), el("td",{text:moeda(p.valor)}), el("td",{text:forma}),
+      el("td",{text:fmtData(p.data)}), el("td",{style:"text-align:right"}, botaoRemover(p))));
+  }
+  atualizarTotal();
+}
+function atualizarTotal(){
+  const credito = document.querySelector('input[name="pmetodo"]:checked').value === "Cartão de crédito";
+  $("pd-parc-wrap").hidden = !credito;
+  const n = $$("#pd-meses input:checked").length;
+  const v = parseMoeda($("pd-valor").value);
+  const p = Number($("pd-parc").value) || 1;
+  let t = "";
+  if(n && v>0){
+    t = `${n} mês(es) × ${moeda(v)} = ${moeda(n*v)}`;
+    if(credito && p>1) t += ` · ${p}x de ${moeda(n*v/p)}`;
+  }
+  $("pd-total").textContent = t;
+}
+async function registrarPagamentos(){
+  const a = S.alunos.find(x=>x.id===S.pagId); if(!a) return;
+  const refs = $$("#pd-meses input:checked").map(i=>i.value);
+  const valor = parseMoeda($("pd-valor").value);
+  if(!refs.length){ toast("Marque ao menos um mês."); return; }
+  if(!(valor>0)){ toast("Informe o valor por mês."); return; }
+  const metodo = document.querySelector('input[name="pmetodo"]:checked').value;
+  const parcelas = metodo==="Cartão de crédito" ? (Number($("pd-parc").value)||1) : 1;
+  const data = $("pd-data").value || iso(new Date());
+  await gravar(async()=>{
+    for(const ref of refs){
+      await S.db.collection("pagamentos").doc().set({alunoId:a.id, ref, valor, metodo, parcelas, data});
+    }
+  }, refs.length>1 ? `${refs.length} pagamentos registrados.` : "Pagamento registrado.");
+}
+function botaoRemover(p){
+  const b = el("button",{class:"btn sm danger", type:"button", text:"Remover"});
+  b.addEventListener("click", async()=>{
+    if(!b.dataset.ok){
+      b.dataset.ok = "1"; b.textContent = "Confirmar?";
+      setTimeout(()=>{ delete b.dataset.ok; b.textContent = "Remover"; }, 3500);
+      return;
+    }
+    await gravar(()=>S.db.collection("pagamentos").doc(p.id).delete(), "Pagamento removido.");
+  });
+  return b;
+}
+function salvarConfig(){
+  const valor = parseMoeda($("cfg-valor").value);
+  if(!(valor>0)){ toast("Informe um valor válido."); return; }
+  gravar(()=>S.db.doc("config/taxas").set({valor}), "Valor salvo.");
+}
+
+/* ---------- anexos ---------- */
+function marcarRecebido(id, key, val){
+  gravar(()=>S.db.collection("alunos").doc(id).update({anexos:{[key]:{recebido:val}}}));
+}
+const LIMITE_ANEXO = 20*1024*1024;
+const TIPOS_ANEXO = ["image/png","image/jpeg","image/gif","image/webp","application/pdf"];
+const EXT_ANEXO = {jpg:"image/jpeg", jpeg:"image/jpeg", jfif:"image/jpeg", png:"image/png", gif:"image/gif", webp:"image/webp", pdf:"application/pdf"};
+const ANX_MSG = {};
+const MSG_UPLOAD = {
+  unsupported_type: "Formato não aceito. Envie uma foto (JPG ou PNG) ou um PDF.",
+  invalid_request: "Arquivo inválido. Tente outro arquivo.",
+  too_large: "Arquivo grande demais (limite de 20 MB).",
+  quota_or_state: "Não há mais espaço para arquivos nesta página.",
+  rate_limited: "Muitos envios seguidos. Aguarde alguns segundos e tente de novo.",
+  upstream_auth: "Sessão expirada. Recarregue a página e tente de novo.",
+  capability_disabled: "Anexos não estão disponíveis nesta visualização.",
+  not_granted: "Anexos não estão disponíveis nesta visualização.",
+  capability_removed: "Anexos não estão disponíveis nesta visualização.",
+  store_unavailable: "Falha temporária ao enviar. Tente de novo."
+};
+function mensagemUpload(e){ return MSG_UPLOAD[e && e.code] || "Não foi possível enviar o arquivo. Tente de novo."; }
+/* Converte fotos em outros formatos (ex.: HEIC do iPhone) para JPEG, quando o navegador consegue ler o arquivo. */
+function paraJpeg(file){
+  return new Promise((ok, err)=>{
+    const url = URL.createObjectURL(file), img = new Image();
+    const falhou = ()=>{ URL.revokeObjectURL(url); err(new Error("Este formato não pôde ser lido. Envie a foto em JPG ou PNG, ou um PDF.")); };
+    img.onload = ()=>{
+      const w = img.naturalWidth, h = img.naturalHeight;
+      if(!w || !h){ falhou(); return; }
+      const k = Math.min(1, 2400/Math.max(w,h)), c = document.createElement("canvas");
+      c.width = Math.round(w*k); c.height = Math.round(h*k);
+      const x = c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,c.width,c.height);
+      x.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      c.toBlob(b=>{ if(b) ok(b); else err(new Error("Não foi possível converter a foto. Envie em JPG ou PNG.")); }, "image/jpeg", 0.9);
+    };
+    img.onerror = falhou;
+    img.src = url;
+  });
+}
+/* Escolhe o tipo certo pelo tipo informado ou pela extensão. Lança Error com a mensagem para a pessoa. */
+async function prepararArquivo(file){
+  const ext = (file.name.split(".").pop() || "").toLowerCase();
+  let tipo = file.type === "image/jpg" ? "image/jpeg" : file.type;
+  if(!TIPOS_ANEXO.includes(tipo)) tipo = EXT_ANEXO[ext] || tipo;
+  if(TIPOS_ANEXO.includes(tipo)){
+    return {blob: tipo===file.type ? file : new Blob([file], {type:tipo}), type: tipo};
+  }
+  const imagem = (file.type.startsWith("image/") && file.type!=="image/svg+xml") || ["heic","heif","bmp","tif","tiff"].includes(ext);
+  if(imagem) return {blob: await paraJpeg(file), type: "image/jpeg"};
+  throw new Error("Formato não aceito. Envie uma foto (JPG ou PNG) ou um PDF.");
+}
+/* Envia uma vez de novo se o serviço estiver momentaneamente indisponível. */
+async function enviarArquivo(blob, type){
+  try{ return await S.assets.upload(blob, {type}); }
+  catch(e){
+    if(e && e.code==="store_unavailable"){ await new Promise(r=>setTimeout(r,1500)); return S.assets.upload(blob, {type}); }
+    throw e;
+  }
+}
+async function anexar(id, key, label, file){
+  if(!file) return;
+  const chave = id+":"+key;
+  const aviso = (tipo, texto)=>{ if(texto) ANX_MSG[chave] = {tipo, texto}; else delete ANX_MSG[chave]; renderAnexos(); };
+  if(!S.assets){ aviso("erro", "Anexos não estão disponíveis nesta visualização."); return; }
+  if(file.size > LIMITE_ANEXO){ aviso("erro", "Arquivo acima de 20 MB. Envie uma foto ou um PDF menor."); return; }
+  aviso("info", "Preparando arquivo…");
+  let arq;
+  try{ arq = await prepararArquivo(file); }
+  catch(e){ aviso("erro", e.message); return; }
+  aviso("info", "Enviando arquivo…");
+  let r;
+  try{ r = await enviarArquivo(arq.blob, arq.type); }
+  catch(e){ console.error(e); aviso("erro", mensagemUpload(e)); return; }
+  const ok = await gravar(()=>S.db.collection("alunos").doc(id).update(
+    {anexos:{[key]:{recebido:true, assetId:r.id, nome:file.name}}}), label+" anexado.");
+  aviso("erro", ok ? "" : "O arquivo foi enviado, mas não foi salvo no aluno. Tente de novo.");
+}
+/* Abre um arquivo anexado usando o endereço que o serviço de arquivos informa para esta visualização. */
+/* Abre o anexo dentro da própria página (não em nova aba), lendo o arquivo pelo endereço informado pelo serviço. */
+async function verArquivo(id, key, assetId, nomeArquivo){
+  const chave = id+":"+key;
+  const falha = texto => { ANX_MSG[chave] = {tipo:"erro", texto}; renderAnexos(); };
+  if(!S.assets){ falha("Arquivos só podem ser abertos pelo link do Claude."); return; }
+  let item;
+  try{
+    const lista = await S.assets.list();
+    item = lista.assets.find(x=>x.id===assetId);
+  }catch(e){ console.error(e); falha(mensagemUpload(e)); return; }
+  if(!item){ falha("Arquivo não encontrado no armazenamento desta página. Anexe o documento de novo."); return; }
+  const origem = new URL(item.url, document.baseURI).href;
+  let src = origem, local = false;
+  try{
+    const r = await fetch(origem);
+    if(!r.ok){ falha(`Não foi possível abrir o arquivo (erro ${r.status}). Se continuar, anexe o documento de novo.`); return; }
+    src = URL.createObjectURL(await r.blob());
+    local = true;
+  }catch(e){
+    console.error(e);   // sem leitura direta: tenta o endereço na própria janela de visualização
+  }
+  delete ANX_MSG[chave];
+  renderAnexos();
+  const titulo = (DOCS.find(([k])=>k===key)||[])[1] || "Documento";
+  abrirVisor(item, titulo, src, local, nomeArquivo);
+}
+/* Baixa o anexo com o nome original do arquivo, no celular ou no computador. */
+const EXT_DOWNLOAD = {"image/png":"png","image/jpeg":"jpg","image/gif":"gif","image/webp":"webp","application/pdf":"pdf"};
+/* Oferece o arquivo para salvar no aparelho. Retorna null se salvou ou se a pessoa cancelou; senão, a mensagem de erro. */
+async function salvarNoAparelho(blob, nomeBase, contentType){
+  if(!S.downloads) return "Baixar não está disponível nesta visualização.";
+  const ext = EXT_DOWNLOAD[contentType];
+  if(!ext) return "Este tipo de arquivo não pode ser baixado.";
+  const base = String(nomeBase || "documento").replace(/[\\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 150) || "documento";
+  try{
+    await S.downloads.save({filename: base + "." + ext, data: blob});
+    return null;
+  }catch(e){
+    console.error(e);
+    const code = e && e.code;
+    if(code === "declined") return null;
+    if(code === "rate_limited") return "Aguarde um instante e tente baixar de novo.";
+    if(code === "too_large") return "Arquivo grande demais para baixar.";
+    if(code === "unavailable" || code === "not_granted" || code === "capability_disabled" || code === "capability_removed") return "Baixar não está disponível nesta visualização.";
+    return "Não foi possível salvar o arquivo. Tente de novo.";
+  }
+}
+/* Baixa o anexo com o nome do aluno e do documento, no celular ou no computador. */
+async function baixarArquivo(id, key, assetId, nomeArquivo){
+  const chave = id+":"+key;
+  const falha = texto => { ANX_MSG[chave] = {tipo:"erro", texto}; renderAnexos(); };
+  if(!S.assets){ falha("Baixar arquivos só funciona pelo link do Claude."); return; }
+  if(!S.downloads){ falha("Baixar não está disponível nesta visualização."); return; }
+  let item;
+  try{ item = (await S.assets.list()).assets.find(x=>x.id===assetId); }
+  catch(e){ console.error(e); falha(mensagemUpload(e)); return; }
+  if(!item){ falha("Arquivo não encontrado no armazenamento desta página. Anexe o documento de novo."); return; }
+  const origem = new URL(item.url, document.baseURI).href;
+  let blob;
+  try{
+    const r = await fetch(origem);
+    if(!r.ok){ falha(`Não foi possível baixar o arquivo (erro ${r.status}).`); return; }
+    blob = await r.blob();
+  }catch(e){ console.error(e); falha("Não foi possível baixar o arquivo. Tente de novo."); return; }
+  const erro = await salvarNoAparelho(blob, nomeArquivo, item.contentType);
+  if(erro){ falha(erro); return; }
+  delete ANX_MSG[chave];
+  renderAnexos();
+}
+
+function abrirVisor(item, titulo, src, local, nomeArquivo){
+  const ehImagem = (item.contentType||"").startsWith("image/");
+  const dlg = el("dialog", {class:"visor"});
+  const corpo = ehImagem ? el("img",{src, alt:titulo}) : el("iframe",{src, title:titulo});
+  if(ehImagem) corpo.addEventListener("error", ()=>corpo.replaceWith(el("p",{class:"erro-txt", text:"Não foi possível exibir esta imagem. Use “Baixar”."})));
+  const aviso = el("p",{class:"erro-txt"});
+  const baixar = async ()=>{
+    aviso.textContent = "";
+    let blob;
+    try{ blob = await (await fetch(src)).blob(); }
+    catch(e){ console.error(e); aviso.textContent = "Não foi possível baixar o arquivo. Tente de novo."; return; }
+    aviso.textContent = (await salvarNoAparelho(blob, nomeArquivo || titulo, item.contentType)) || "";
+  };
+  dlg.append(
+    el("div",{class:"visor-head"},
+      el("strong",{text:titulo}),
+      el("div",{class:"end"},
+        S.downloads ? el("button",{class:"btn sm", type:"button", text:"Baixar", onclick:baixar}) : null,
+        (!ehImagem && local) ? el("a",{class:"btn sm", href:src, target:"_blank", rel:"noopener", text:"Abrir em outra aba"}) : null,
+        el("button",{class:"btn sm", type:"button", text:"Fechar", onclick:()=>dlg.close()}))),
+    aviso,
+    el("div",{class:"visor-corpo"}, corpo));
+  dlg.addEventListener("close", ()=>{ if(local) URL.revokeObjectURL(src); dlg.remove(); });
+  document.body.append(dlg);
+  dlg.showModal();
+}
+function renderAnexos(){
+  const lista = ativos().sort(porNome);
+  if(!S.anxId || !lista.some(a=>a.id===S.anxId)) S.anxId = lista[0] ? lista[0].id : "";
+  const sel = $("anx-sel");
+  sel.replaceChildren(...(lista.length
+    ? lista.map(a=>el("option",{value:a.id, text:a.nome}))
+    : [el("option",{value:"", text:"Nenhum aluno ativo"})]));
+  sel.value = S.anxId;
+  $("anx-aviso").hidden = !!S.assets;
+  const box = $("anx-docs"); box.replaceChildren();
+  const a = lista.find(x=>x.id===S.anxId);
+  if(!a){ box.append(vazio("Cadastre um aluno para anexar documentos.")); return; }
+  for(const [key,label] of DOCS){
+    const info = (a.anexos||{})[key] || {};
+    const cb = el("input",{type:"checkbox", "aria-label":"Recebido: "+label,
+      onchange:e=>marcarRecebido(a.id, key, e.target.checked)});
+    cb.checked = !!info.recebido;
+    const msgAnx = ANX_MSG[a.id+":"+key];
+    box.append(el("div",{class:"row "+(info.recebido ? "ok" : "due")},
+      el("div",{class:"info"},
+        el("strong",{text:label}),
+        el("small",{text: info.nome ? "Arquivo: "+info.nome : (info.recebido ? "Recebido" : "Pendente")}),
+        msgAnx ? el("small",{class: msgAnx.tipo==="erro" ? "erro-txt" : "", text: msgAnx.texto}) : null),
+      el("div",{class:"end"},
+        el("label",{class:"chk"}, cb, el("span",{text:"Recebido"})),
+        S.assets ? el("label",{class:"btn sm arquivo"}, "Escolher arquivo",
+          el("input",{type:"file", accept:"image/*,application/pdf", "aria-label":"Escolher arquivo para "+label,
+            onchange:e=>anexar(a.id, key, label, e.target.files[0])})) : null,
+        S.assets ? el("label",{class:"btn sm arquivo"}, "Tirar foto",
+          el("input",{type:"file", accept:"image/*", capture:"environment", "aria-label":"Tirar foto para "+label,
+            onchange:e=>anexar(a.id, key, label, e.target.files[0])})) : null,
+        info.assetId ? el("button",{class:"btn sm", type:"button", text:"Ver", onclick:()=>verArquivo(a.id, key, info.assetId, a.nome+" - "+label)}) : null,
+        info.assetId && S.downloads ? el("button",{class:"btn sm", type:"button", text:"Baixar", onclick:()=>baixarArquivo(a.id, key, info.assetId, a.nome+" - "+label)}) : null)));
+  }
+}
+
+/* ---------- alunos que saíram ---------- */
+function reativar(id){
+  gravar(()=>S.db.collection("alunos").doc(id).update({status:"ativo", saidaData:"", saidaMotivo:""}), "Aluno reativado.");
+}
+function renderSaidos(){
+  const sel = $("sai-sel"), prev = sel.value;
+  const lista = ativos().sort(porNome);
+  sel.replaceChildren(...(lista.length
+    ? lista.map(a=>el("option",{value:a.id, text:a.nome}))
+    : [el("option",{value:"", text:"Nenhum aluno ativo"})]));
+  sel.value = lista.some(a=>a.id===prev) ? prev : (lista[0] ? lista[0].id : "");
+  if(!$("sai-data").value) $("sai-data").value = iso(new Date());
+  const q = norm($("q-sai").value);
+  const rows = saidos().filter(a=>!q || norm(a.nome).includes(q))
+    .sort((x,y)=>String(y.saidaData||"").localeCompare(String(x.saidaData||"")));
+  const box = $("lista-sai"); box.replaceChildren();
+  if(!rows.length){ box.append(vazio(q ? "Nenhum aluno encontrado." : "Nenhum aluno saiu até agora.")); return; }
+  for(const a of rows){
+    box.append(el("div",{class:"row"}, miniatura(a),
+      el("div",{class:"info"},
+        el("strong",{text:a.nome}),
+        el("small",{text:`Saiu em ${fmtData(a.saidaData)}${a.saidaMotivo ? " · "+a.saidaMotivo : ""}`})),
+      el("div",{class:"end"}, catTag(a.categoria),
+        el("button",{class:"btn sm", type:"button", text:"Reativar", onclick:()=>reativar(a.id)}))));
+  }
+}
+function registrarSaida(){
+  const id = $("sai-sel").value, data = $("sai-data").value, motivo = $("sai-motivo").value.trim();
+  if(!id){ toast("Escolha um aluno."); return; }
+  if(!data){ toast("Informe a data da saída."); return; }
+  gravar(()=>S.db.collection("alunos").doc(id).update({status:"saiu", saidaData:data, saidaMotivo:motivo}),
+    "Aluno movido para alunos que saíram.").then(ok=>{
+      if(ok){ $("sai-motivo").value = ""; if(S.pagId===id) S.pagId = null; }
+    });
+}
+
+/* ---------- cobranças aos responsáveis (aba Cobranças) ---------- */
+const TEXTO_PADRAO = "Olá, {responsavel}! Tudo bem? Passando para lembrar que a mensalidade de {aluno} está em aberto: {meses}, no total de {total}. Pode regularizar? Qualquer dúvida, é só responder. Obrigado!";
+let textoCob = TEXTO_PADRAO;
+
+/* ---------- resumo e renderização ---------- */
+function renderStats(){
+  const sit = ativos().map(a=>situacao(a));
+  $("s-ativos").textContent = sit.length;
+  $("s-ok").textContent = sit.filter(s=>s.key==="ok").length;
+  $("s-due").textContent = sit.filter(s=>s.key==="due").length;
+  $("s-late").textContent = sit.filter(s=>s.key==="late").length;
+}
+function render(){ renderStats(); renderCadastro(); renderMensal(); renderCobranca(); renderAnexos(); renderSaidos(); }
+
+/* ---------- cobranças para os responsáveis (aba Cobranças) ---------- */
+function linkWhats(num, texto){
+  let d = String(num||"").replace(/\D/g,"");
+  if(!(d.startsWith("55") && d.length>=12)) d = "55" + d;
+  return `https://wa.me/${d}?text=${encodeURIComponent(texto)}`;
+}
+function mensagemCobranca(a, vencidos, total){
+  const resp = a.mae || a.pai || "responsável";
+  const meses = vencidos.map(o=>mesLabel(o.ref)).join(", ");
+  return textoCob.replace(/\{responsavel\}/g, ()=>resp).replace(/\{aluno\}/g, ()=>a.nome)
+    .replace(/\{meses\}/g, ()=>meses).replace(/\{total\}/g, ()=>moeda(total));
+}
+async function copiar(texto){
+  try{ await navigator.clipboard.writeText(texto); toast("Mensagem copiada."); }
+  catch(e){ toast("Não foi possível copiar. Abra \"Ver mensagem\" e copie o texto."); }
+}
+function renderCobranca(){
+  const box = $("lista-cob"); box.replaceChildren();
+  const lista = ativos().map(a=>({a, s:situacao(a)})).filter(x=>x.s.key==="late").sort((x,y)=>porNome(x.a,y.a));
+  if(!lista.length){ box.append(vazio("Nenhuma mensalidade atrasada no momento.")); return; }
+  for(const {a,s} of lista){
+    const vencidos = s.abertos.filter(o=>o.vencido);
+    const total = vencidos.length * S.cfg.valor;
+    const texto = mensagemCobranca(a, vencidos, total);
+    const tels = [1,2,3].map(i=>({rot:a[`tel${i}_rot`]||`Telefone ${i}`, num:a[`tel${i}_num`]})).filter(p=>p.num);
+    box.append(el("div",{class:"row late"},
+      miniatura(a),
+      el("div",{class:"info"},
+        el("strong",{text:a.nome}),
+        el("small",{text:`${vencidos.length} mês(es) em atraso: ${vencidos.map(o=>mesLabel(o.ref)).join(", ")}`}),
+        el("small",{text: total>0 ? `Total: ${moeda(total)}` : "Informe o valor da mensalidade na aba Mensalidades."}),
+        el("details",{class:"msg"}, el("summary",{text:"Ver mensagem"}), el("p",{text:texto}))),
+      el("div",{class:"end"},
+        tels.map(p=>el("a",{class:"btn sm", href:linkWhats(p.num, texto), target:"_blank", rel:"noopener", text:`WhatsApp · ${p.rot}`})),
+        el("button",{class:"btn sm", type:"button", text:"Copiar mensagem", onclick:()=>copiar(texto)}))));
+  }
+}
+
+/* ---------- modo claro e escuro (a escolha fica salva neste navegador) ---------- */
+const TEMA_KEY = "escolinha-tema";
+function temaAtual(){
+  const marcado = document.documentElement.dataset.theme;
+  if(marcado) return marcado;
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+function mostrarTema(){
+  const escuro = temaAtual() === "dark";
+  const b = $("tema");
+  b.textContent = escuro ? "Modo claro" : "Modo escuro";
+  b.setAttribute("aria-pressed", String(escuro));
+}
+function alternarTema(){
+  const novo = temaAtual() === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = novo;
+  try{ localStorage.setItem(TEMA_KEY, novo); }catch(e){}
+  mostrarTema();
+}
+try{
+  const salvo = localStorage.getItem(TEMA_KEY);
+  if(salvo === "light" || salvo === "dark") document.documentElement.dataset.theme = salvo;
+}catch(e){}
+
+/* ---------- eventos ---------- */
+$$(".tab").forEach(t=>t.addEventListener("click", ()=>aba(t.dataset.tab)));
+$$("[data-save]").forEach(b=>b.addEventListener("click", salvarFicha));
+$$("[data-clear]").forEach(b=>b.addEventListener("click", limparFicha));
+$("foto-input").addEventListener("change", async e=>{
+  const f = e.target.files[0]; if(!f) return;
+  try{ S.foto = await reduzirFoto(f); mostrarFoto(); }
+  catch(_){ toast("Não foi possível ler esta imagem."); }
+});
+$("q-cad").addEventListener("input", renderCadastro);
+$("q-pag").addEventListener("input", renderMensal);
+$("q-sai").addEventListener("input", renderSaidos);
+$("cfg-salvar").addEventListener("click", salvarConfig);
+$("pd-fechar").addEventListener("click", ()=>{ S.pagId = null; renderMensal(); });
+$("pd-registrar").addEventListener("click", registrarPagamentos);
+$("pd-valor").addEventListener("input", atualizarTotal);
+$("pd-parc").addEventListener("change", atualizarTotal);
+$$('input[name="pmetodo"]').forEach(r=>r.addEventListener("change", atualizarTotal));
+$("anx-sel").addEventListener("change", e=>{ S.anxId = e.target.value; renderAnexos(); });
+$("sai-reg").addEventListener("click", registrarSaida);
+$("cob-texto").value = textoCob;
+$("cob-texto").addEventListener("input", e=>{ textoCob = e.target.value; renderCobranca(); });
+$("cob-padrao").addEventListener("click", ()=>{ textoCob = TEXTO_PADRAO; $("cob-texto").value = textoCob; renderCobranca(); });
+
+$("tema").addEventListener("click", alternarTema);
+mostrarTema();
+
+render();$("copia-salvar").addEventListener("click", salvarCopia);
+$("copia-restaurar").addEventListener("change", e=>{ const f = e.target.files[0]; e.target.value = ""; if(f) restaurarCopia(f); });
+
+boot();
+})();
+</script>
